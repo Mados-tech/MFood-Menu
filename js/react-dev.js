@@ -75,17 +75,17 @@ function OrderMenu() {
 
       <div className="Orders_container">
         <div className="single_order_container">
-       
-              <img src="https://i.guim.co.uk/img/media/e3ea5d04e32182134a133c6a8f1eb3328e2c8246/0_0_4367_3716/master/4367.jpg?width=465&quality=85&dpr=1&s=none" alt="img_thumbnail" width={40} height={40} />
-            <div>
-              <h5>Hamburger</h5>
-              <p>$00.1</p>
-            </div>
-            <div>
-              <input type="text" />
-              <p>$00.1</p>
-            </div>
+          <img src="https://i.guim.co.uk/img/media/e3ea5d04e32182134a133c6a8f1eb3328e2c8246/0_0_4367_3716/master/4367.jpg?width=465&quality=85&dpr=1&s=none" alt="img_thumbnail" width={40} height={40} />
+          <div className="description">
+            <h5>Hamburger</h5>
+            <p>$00.1</p>
           </div>
+          <div className="quantity_changer">
+            <input type="number" placeholder={"x1"}/>
+            <p>100 100 Fbu</p>
+            <i className="fa-solid fa-trash-can"></i>
+          </div>
+        </div>
       </div>
     </div>
 
