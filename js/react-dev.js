@@ -81,7 +81,7 @@ function OrderMenu() {
           <div className="details_order_container">
             <div>
               <h5>Hamburger</h5>
-              <p>$00.1</p>
+              <p>$00.1</p> b
             </div>
             <div>
               <input type="text" />
