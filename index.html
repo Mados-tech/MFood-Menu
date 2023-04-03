@@ -27,5 +27,18 @@
 <script src="./js/data-source.js"></script>
 <script defer type="text/babel" src="./js/react-dev.js"></script>
 <script src="./js/react-prod.js"></script>
-
+<script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js'
+    import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-messaging.js";
+    
+    const firebaseConfig = {
+    };
+    const app = initializeApp(firebaseConfig);
+  const messaging = getMessaging(app);
+  
+  getToken(messaging, {vapidKey: 'GENERATED_MESSAGING_KEY'}).then(token => {
+    console.log(token);
+    onMessage(messaging, console.log);
+  });
+</script>
 </html>
