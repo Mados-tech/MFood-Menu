@@ -14,13 +14,7 @@ function ListMenu({ iconName, link, listname, active }) {
 
 function ListCategory({ CategorieName, id, onSelect, active }) {
   return (
-    <div
-      className={`smallCategory ${active ? "active" : ""}`}
-      onClick={(e) => {
-        e.stopPropagation();
-        onSelect(id);
-      }}
-    >
+    <div className={`smallCategory ${active ? "active" : ""}`} onClick={(e) => { e.stopPropagation(); onSelect(id); }}>
       <i className="fa-solid fa-bacon"></i>
       <p>{CategorieName}</p>
     </div>
@@ -28,34 +22,25 @@ function ListCategory({ CategorieName, id, onSelect, active }) {
 }
 
 function Recipe({ id, Name, Price, Currency, CurrencyId, Description, Url }) {
-  return (
-    <div
-      className="single_recipe_container"
-      onClick={(e) => {
-        e.stopPropagation();
-        STORE.dispatch({
-          type: ACTION_REDUX.ADD_PRODUCT_TO_ORDER,
-          payload: {
-            id,
-            Price,
-            CurrencyId,
-          },
-        });
-      }}
-    >
-      <img
-        src={Url || DefaultRecipeImage}
-        alt="recipeID"
-        width={80}
-        height={80}
-      />
 
+  const [{ OrderCreated, Order }, setOrder] = React.useState(STORE.getState());
+  STORE.subscribe(() => setOrder(_ => STORE.getState()));
+
+  const onClick = function (e) {
+    e.stopPropagation();
+    const isOrdered = !!Order?.Product?.find(_ => _.ProductId === id);
+    const payload = { ProductId: id, Price, Quantity: 1.0, CurrencyId };
+    if (OrderCreated && !isOrdered) return ADD_PRODUCT_TO_ORDER(Order._id, [payload]).then((data) => STORE.dispatch({ type: ACTION_REDUX.ORDER_CREATED, payload: data }));
+    STORE.dispatch({ type: ACTION_REDUX.ADD_PRODUCT_TO_ORDER, payload });
+  };
+
+  console.log("Product : ", Name, " ", id, " OrderCreated : ", OrderCreated);
+  return (
+    <div className="single_recipe_container" onClick={onClick} >
+      <img src={Url || DefaultRecipeImage} alt="recipeID" width={80} height={80} />
       <div className="details">
-        <h3>{Name}</h3>
-        <p>
-          {Currency}
-          {Price}
-        </p>
+        <h3>{Name} product of the year my niggar.</h3>
+        <p>{Currency} {Price}</p>
       </div>
     </div>
   );
@@ -68,19 +53,10 @@ function SideBar() {
         <img src="../assets/logoApp.png" alt="MFood" width={40} height={40} />
       </div>
       <ul className="Menu_categories">
-        <ListMenu
-          iconName={"fa-solid fa-utensils"}
-          link={"#"}
-          active={true}
-          listname={"Food"}
-        />
-
-        <ListMenu
-          iconName={"fa-solid fa-champagne-glasses"}
-          link={"#"}
-          listname={"Drink"}
-        />
+        <ListMenu iconName={"fa-solid fa-utensils"} link={"#"} active={true} listname={"Food"} />
+        <ListMenu iconName={"fa-solid fa-champagne-glasses"} link={"#"} listname={"Drink"} />
       </ul>
+      <i className="fas fa-bars" />
     </div>
   );
 }
@@ -88,45 +64,18 @@ function SideBar() {
 function OrderProduct({ ProductId, Name, Price, Quantity, Currency, Url }) {
   return (
     <div className="single_order_container">
-      <img
-        src={Url || DefaultRecipeImage}
-        alt="img_thumbnail"
-        width={40}
-        height={40}
-      />
+      <img src={Url || DefaultRecipeImage} alt="img_thumbnail" width={40} height={40} />
       <div className="description">
         <h5>{Name}</h5>
-        <p>
-          {Currency} {Price}
-        </p>
+        <p>{Currency} {Price}</p>
       </div>
       <div className="quantity_changer">
-        <input
-          type="number"
-          placeholder={"x1"}
-          min={0.0}
-          onChange={({ target }) => {
-            STORE.dispatch({
-              type: ACTION_REDUX.UPDATE_PRODUCT_TO_ORDER,
-              payload: {
-                id: ProductId,
-                data: { Quantity: Number(target.value) },
-              },
-            });
-          }}
-        />
-        <p>
-          {Quantity * Price} {Currency}
-        </p>
-        <i
-          className="fa-solid fa-trash-can"
-          onClick={(e) => {
-            e.stopPropagation();
-            STORE.dispatch({
-              type: ACTION_REDUX.DELETE_PRODUCT_TO_ORDER,
-              payload: ProductId,
-            });
-          }}
+        <input type="number" placeholder={"x1"} min={0.0} onChange={({ target }) => STORE.dispatch({ type: ACTION_REDUX.UPDATE_PRODUCT_TO_ORDER, payload: { id: ProductId, data: { Quantity: Number(target.value) } } })} />
+        <p>{Quantity * Price} {Currency}</p>
+        <i className="fa-solid fa-trash-can" onClick={(e) => {
+          e.stopPropagation();
+          STORE.dispatch({ type: ACTION_REDUX.DELETE_PRODUCT_TO_ORDER, payload: ProductId });
+        }}
         ></i>
       </div>
     </div>
@@ -138,80 +87,59 @@ function OrderMenu() {
 
   STORE.subscribe(() => {
     const { Order, Menu, OrderCreated } = STORE.getState();
-    const Products = Menu.Categories?.reduce(
-      (_, __) => [..._, ...__.Product],
-      []
-    );
+    const Products = Menu.Categories?.reduce((_, __) => [..._, ...__.Product], []);
+
     const StateOrder = Order.Product.map((_) => {
-      let { Name, Currency, Url } = Products.find(
-        (item) => item.id === _.ProductId
-      );
+      let { Name, Currency, Url } = Products.find((item) => item.id === _.ProductId);
       return { ..._, Name, Currency, Url };
     });
-    setState({
-      OrderCreated,
-      Product: StateOrder,
-      Currency: Menu.Currency.Symbol,
-    });
+
+    setState({ OrderCreated, Product: StateOrder, Currency: Menu.Currency.Symbol });
   });
 
   const Total = state.Product?.reduce((_, __) => _ + __.Price * __.Quantity, 0);
   return (
     <div className="order_container">
-      <h1>
-        Order <span>Menu</span>
-      </h1>
-
-      <div className="Orders_container">
+      <div className="order_container_children">
+        <h1 className="order_container_children_header_title">Order <span>Menu</span></h1>
         <div className="wrapper">
-          {state.Product?.map((_) => (
-            <OrderProduct key={_.ProductId} {..._} />
-          ))}
+          {state.Product?.map((_) => <OrderProduct key={_.ProductId} {..._} />)}
         </div>
         <div className="Price_displayer">
           <div className="price">
             <p>Sub Tot</p>
-            <p>
-              {state.Currency} {Total}
-            </p>
+            <p>{state.Currency} {Total}</p>
           </div>
           <div className="price">
             <p>Tot Gen</p>
-            <p>
-              {state.Currency} {Total}
-            </p>
+            <p>{state.Currency} {Total}</p>
           </div>
 
           <button
             disabled={state.OrderCreated}
             onClick={(e) => {
               e.stopPropagation();
-              CREATE_ORDER(STORE.getState().Order)
-                .then((payload) => {
-                  STORE.dispatch({ type: ACTION_REDUX.ORDER_CREATED, payload });
-                  console.log(payload);
-                })
-                .catch(console.error);
+              const order = { ...STORE.getState().Order, Client: prompt("Hi client, can you give us your name ? It is mandatory !") }
+              CREATE_ORDER(order).then((payload) => STORE.dispatch({ type: ACTION_REDUX.ORDER_CREATED, payload })).catch(console.error);
             }}
           >
             Order
           </button>
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }
 
 function MenuDisplayer() {
-  const [state, setState] = React.useState({ SelectedCategoryId: null });
-  const SelectCategory = (id) =>
-    setState((_) => ({ ..._, SelectedCategoryId: id }));
+  const [state, setState] = React.useState({ SelectedCategoryId: null, FilterKey: null });
+  const SelectCategory = (id) => setState((_) => ({ ..._, SelectedCategoryId: id }));
   STORE.subscribe(() => {
     let { Menu, Order } = STORE.getState();
     setState((_) => ({ ..._, Menu, Order }));
   });
 
-  console.log(state);
+  var ListCategoryFilter = state.FilterKey ? state.Menu?.Categories.filter((_) => _.Name.toLowerCase().includes(state.FilterKey.toLowerCase())) : state.Menu?.Categories;
 
   return (
     <div className="Menu_container">
@@ -220,47 +148,35 @@ function MenuDisplayer() {
           Menu <span>Category</span>
         </h1>
         <div className="search_input">
-          <input type="text" name={"Search"} placeholder={"Search a recipe"} />
+          <input
+            type="text"
+            name={"Search"}
+            placeholder={"Search a recipe"}
+            onChange={({ target: { value } }) => setState((_) => ({ ..._, FilterKey: value }))}
+          />
           <i className="fa-solid fa-magnifying-glass"></i>
         </div>
       </div>
       <div className="menu_category_container">
-        {state.Menu?.Categories?.map((_) => (
-          <ListCategory
-            CategorieName={_.Name}
-            key={_.id}
-            id={_.id}
-            onSelect={SelectCategory}
-            active={_.id === state.SelectedCategoryId}
-          />
-        ))}
+        {ListCategoryFilter?.map((_) => <ListCategory CategorieName={_.Name} key={_.id} id={_.id} onSelect={SelectCategory} active={_.id === state.SelectedCategoryId} />)}
       </div>
-
-      <div className="menu_order_container">
-        <div className="order_title_container">
-          <h1>
-            Choose <span>Order</span>
-          </h1>
-          <span>
-            <p>Sort by</p>
-            <select>
-              <option value="nothing" key="">
-                Relevant
-              </option>
-            </select>
-          </span>
-        </div>
-        <div className="RecipeDisplayer">
-          {state.Menu?.Categories.find(
-            (_) => _.id === state.SelectedCategoryId
-          )?.Product.map((_) => (
-            <Recipe key={_.id} {..._} />
-          ))}
-          {/* {Array.from({ length: 8 }, () => (
-            <Recipe />
-          ))} */}
-        </div>
+      <div className="order_title_container">
+        <h1>
+          Choose <span>Order</span>
+        </h1>
+        <span>
+          <p>Sort by</p>
+          <select>
+            <option value="nothing" key="">
+              Relevant
+            </option>
+          </select>
+        </span>
       </div>
+      <div className="RecipeDisplayer">
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
+      </div>
+      {/* <div className="menu_order_container"></div> */}
     </div>
   );
 }
