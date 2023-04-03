@@ -104,7 +104,7 @@ const STORE = Redux.createStore((state = INIT_STATE, { type, payload }) => {
 
 // ============================================================================================================================
 
-const BASE_URL = "http://44.204.44.197:8000";
+const BASE_URL = "https://backend.mfood.madosgroup.com";
 const headers = {
   "Content-Type": "application/json",
   "x-data-source": "dummy_db",
