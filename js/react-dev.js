@@ -47,10 +47,12 @@ function Recipe({ id, Name, Price, Currency, CurrencyId, Description, Url }) {
 }
 
 function SideBar() {
+  const [ business, setBusiness ] = React.useState({});
+  STORE.subscribe(() => setBusiness(STORE.getState().Menu?.Business || {}));
   return (
     <div className="sideBar">
       <div className="logo">
-        <img src="../assets/logoApp.png" alt="MFood" width={40} height={40} />
+        <img src={business.Logo || "../assets/logoApp.png"} alt="MFood" width={40} height={40} />
       </div>
       <ul className="Menu_categories">
         <ListMenu iconName={"fa-solid fa-utensils"} link={"#"} active={true} listname={"Food"} />

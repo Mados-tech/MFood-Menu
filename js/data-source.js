@@ -11,12 +11,21 @@ Array.prototype.only = function (fun) {
   return List;
 };
 
+const BASE_URL = "http://localhost:8000";
+// const BASE_URL = "https://backend.mfood.madosgroup.com";
+const headers = {
+  "Content-Type": "application/json",
+  "x-data-source": "dummy_db",
+};
+
+
 const INIT_STATE = {
   Menu: {},
   OrderCreated: false,
   Order: {
     Client: "Unknown Client",
     MenuId: null,
+    CurrencyId: null,
     Product: [],
     Metadata: {},
   },
@@ -48,7 +57,9 @@ const STORE = Redux.createStore((state = INIT_STATE, { type, payload }) => {
 
     case ACTION_REDUX.MENU_AVAILABLE:
       delete Metadata.m;
-      return { ...state, Menu: payload, Order: { ...state.Order, MenuId: payload.id, Metadata } };
+      // delete Metadata.b;
+      headers['x-data-source'] = payload.Business.Uuid;
+      return { ...state, Menu: payload, Order: { ...state.Order, CurrencyId: payload.Currency.id, MenuId: payload.id, Metadata } };
 
     case ACTION_REDUX.ADD_PRODUCT_TO_ORDER:
       // AVOID TO ADD AN ITEM TWISE TO THE LIST
@@ -94,34 +105,10 @@ const STORE = Redux.createStore((state = INIT_STATE, { type, payload }) => {
 
 // ============================================================================================================================
 
-const BASE_URL = "https://backend.mfood.madosgroup.com";
-const headers = {
-  "Content-Type": "application/json",
-  "x-data-source": "dummy_db",
-};
-
-const GET_MENU = async (uuid) => fetch(`${BASE_URL}/api/auth/menu/detail-view/${uuid}`).then(async (res) => {
-  const data = await res.json();
-  const Categories_ = {};
-  var Categories = [];
-
-  // FILTER DATA
-  data.MenuProducts.forEach(({ Price, Product: { CategoryProduct, id, Name, Url, Description } }) => {
-    Categories.push(CategoryProduct);
-    let Product = { id, Name, Price, Url, Description, Currency: data.Currency.Symbol, CurrencyId: data.Currency.id };
-    if (CategoryProduct.id in Categories_) return Categories_[CategoryProduct.id].push(Product);
-    Categories_[CategoryProduct.id] = [Product];
-  });
-
-  // ORDER DATA
-  Categories = Categories.only(_ => _.id).map((_) => {
-    _.Product = Categories_[_.id];
-    return _;
-  });
-  delete data.MenuProducts;
-  data.Categories = Categories;
-  STORE.dispatch({ type: ACTION_REDUX.MENU_AVAILABLE, payload: data });
-  return data;
+const GET_MENU = async (uuid) => fetch(`${BASE_URL}/api/auth/menu/detail-view/${uuid}?BusinessId=${Metadata.b || 1}`).then(async (res) => {
+  const payload = await res.json();
+  STORE.dispatch({ type: ACTION_REDUX.MENU_AVAILABLE, payload });
+  return payload;
 }).catch(console.error);
 
 const CREATE_ORDER = async (payload) => fetch(`${BASE_URL}/api/bill`, { method: "POST", body: JSON.stringify(payload), headers }).then(async (res) => await res.json()).catch(console.error);
@@ -132,7 +119,4 @@ const UPDATE_PRODUCT_ORDER = async (order_id, product_id, payload) => fetch(`${B
 
 const DELETE_PRODUCT_ORDER = async (order_id, products) => fetch(`${BASE_URL}/api/bill/${order_id}/product`, { method: "DELETE", body: JSON.stringify(products), headers }).then(async (res) => res.json());
 
-
-
-GET_MENU(Metadata.m || "9d803bb8-21eb-4e30-a086-7b456fe6e4c2").then(console.log);
-// GET_MENU(Metadata.m || "899f1572-bd76-4044-b773-9d0448963a77").then(console.log);
+GET_MENU(Metadata.m || "9f7e9234-f2a6-4daa-802c-403f7e8750f1").then(console.log);
