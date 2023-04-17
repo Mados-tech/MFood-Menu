@@ -18,7 +18,6 @@ const headers = {
   "x-data-source": "dummy_db",
 };
 
-
 const INIT_STATE = {
   Menu: {},
   OrderCreated: false,
@@ -56,9 +55,9 @@ const STORE = Redux.createStore((state = INIT_STATE, { type, payload }) => {
       return payload;
 
     case ACTION_REDUX.MENU_AVAILABLE:
+      headers['x-data-source'] = payload?.Business?.Uuid;
       delete Metadata.m;
       // delete Metadata.b;
-      headers['x-data-source'] = payload.Business.Uuid;
       return { ...state, Menu: payload, Order: { ...state.Order, CurrencyId: payload.Currency.id, MenuId: payload.id, Metadata } };
 
     case ACTION_REDUX.ADD_PRODUCT_TO_ORDER:
@@ -105,7 +104,7 @@ const STORE = Redux.createStore((state = INIT_STATE, { type, payload }) => {
 
 // ============================================================================================================================
 
-const GET_MENU = async (uuid) => fetch(`${BASE_URL}/api/auth/menu/detail-view/${uuid}?BusinessId=${Metadata.b || 1}`).then(async (res) => {
+const GET_MENU = async (uuid) => fetch(`${BASE_URL}/api/auth/menu/detail-view/${uuid}?BusinessId=${Metadata.b || 2}`).then(async (res) => {
   const payload = await res.json();
   STORE.dispatch({ type: ACTION_REDUX.MENU_AVAILABLE, payload });
   return payload;
