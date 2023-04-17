@@ -11,8 +11,8 @@ Array.prototype.only = function (fun) {
   return List;
 };
 
-const BASE_URL = "http://localhost:8000";
-// const BASE_URL = "https://backend.mfood.madosgroup.com";
+const BASE_URL = window.location.protocol === "http:" ? "http://localhost:8000" : "https://backend.mfood.madosgroup.com";
+
 const headers = {
   "Content-Type": "application/json",
   "x-data-source": "dummy_db",
