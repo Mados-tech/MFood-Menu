@@ -194,7 +194,7 @@ function FIREBASE_INIT({
   const messaging = getMessaging(app);
   GET_MENU(Metadata.m || "9f7e9234-f2a6-4daa-802c-403f7e8750f1").then(console.log);
   if (!('serviceWorker' in navigator)) return alert("This browser will nt support background notification, tell this page open.");
-  navigator.serviceWorker.register('./js/firebase-messaging-sw.js').then(() => getToken(messaging, {
+  navigator.serviceWorker.register('firebase-messaging-sw.js').then(() => getToken(messaging, {
     vapidKey: FIREBASE_KEY
   }).then(token => {
     STORE.dispatch({
