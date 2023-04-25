@@ -15,36 +15,20 @@
 </body>
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.21.3/babel.min.js"
-  integrity="sha512-CLQR0eNf/5JIWYwhNK7UGxMT2gZRouZm46rXlZHIye6Zk9ZWHKrGGbRkdPSzehgzBNSoTN/Sm3NGBjzgGgRpgw=="
-  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<!--
-<script src="https://cdnjs.cloudflare.com/ajax/libs/redux/4.2.1/redux.min.js"
-  integrity="sha512-1/8Tj23BRrWnKZXeBruk6wTnsMJbi/lJsk9bsRgVwb6j5q39n0A00gFjbCTaDo5l5XrPVv4DZXftrJExhRF/Ug=="
-  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
--->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.21.3/babel.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.19.1/firebase-messaging.min.js"
   integrity="sha512-uz8sqi0zYNmLAMBL+oUcTmcKhbo8D/PATZwI/QFGpFuhiADBVsa3mHtzMk5wD1BKqWMN+n6d1k5ZOneQFpDKWw=="
   crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://kit.fontawesome.com/ee175aa0d8.js" crossorigin="anonymous"></script>
-
 <script src="./js/redux.min.js"></script>
-<script src="./js/data-source.js"></script>
-<script defer type="text/babel" src="./js/react-dev.js"></script>
+
+<!-- <script src="./js/data-source-dev.js"></script> -->
+<!-- <script defer type="text/babel" src="./js/react-dev.js"></script> -->
+
 <script src="./js/react-prod.js"></script>
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js'
   import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-messaging.js";
-
-  const firebaseConfig = {
-  };
-  const app = initializeApp(firebaseConfig);
-  const messaging = getMessaging(app);
-
-  getToken(messaging, { vapidKey: 'GENERATED_MESSAGING_KEY' }).then(token => {
-    console.log(token);
-    onMessage(messaging, console.log);
-  });
+  FIREBASE_INIT({ initializeApp, getMessaging, getToken, onMessage });
 </script>
-
 </html>

@@ -38,6 +38,10 @@
   padding-block: 0.5rem;
 }
 
+.sideBar .logo img {
+  border-radius: 50%;
+}
+
 .sideBar > .Menu_categories {
   padding-block: 2rem;
   display: flex;

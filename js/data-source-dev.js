@@ -11,7 +11,8 @@ Array.prototype.only = function (fun) {
   return List;
 };
 
-const BASE_URL = window.location.protocol === "http:" ? "http://localhost:8000" : "https://backend.mfood.madosgroup.com";
+// const BASE_URL = window.location.protocol === "http:" ? "http://localhost:8000" : "https://backend.mfood.madosgroup.com";
+const BASE_URL = "https://backend.mfood.madosgroup.com";
 
 const headers = {
   "Content-Type": "application/json",
@@ -22,6 +23,7 @@ const INIT_STATE = {
   Menu: {},
   OrderCreated: false,
   Order: {
+    FcmClientToken: null,
     Client: "Unknown Client",
     MenuId: null,
     CurrencyId: null,
@@ -37,6 +39,7 @@ const ACTION_REDUX = {
   UPDATE_PRODUCT_TO_ORDER: "UPDATE_PRODUCT_TO_ORDER",
   DELETE_PRODUCT_TO_ORDER: "DELETE_PRODUCT_TO_ORDER",
   ORDER_CREATED: "ORDER_CREATED",
+  FCM_DEVICE_TOKEN_CREATED: "FCM_DEVICE_TOKEN_CREATED",
 };
 
 const PROCESS_STORE = {
@@ -53,6 +56,9 @@ const STORE = Redux.createStore((state = INIT_STATE, { type, payload }) => {
   switch (type) {
     case ACTION_REDUX.INIT_DATA:
       return payload;
+
+    case ACTION_REDUX.FCM_DEVICE_TOKEN_CREATED:
+      return { ...state, Order: { ...state.Order, FcmClientToken: payload } };
 
     case ACTION_REDUX.MENU_AVAILABLE:
       headers['x-data-source'] = payload?.Business?.Uuid;
@@ -73,12 +79,10 @@ const STORE = Redux.createStore((state = INIT_STATE, { type, payload }) => {
           PROCESS_STORE.UPDATE_PRODUCT_TO_ORDER_REQUEST = null;
         }
         PROCESS_STORE.UPDATE_PRODUCT_TO_ORDER_REQUEST = setTimeout(() => {
-          let ProductId = state.Order.Product.find(
-            (_) => _.ProductId === payload.id
-          ).id;
+          let ProductId = state.Order.Product.find(_ => _.ProductId === payload.id).id;
           UPDATE_PRODUCT_ORDER(state.Order._id, ProductId, payload.data);
         }, REQUEST_DELAY);
-      }
+      };
 
       // LOCAL UPDATE
       // UPDATE THE LIST
@@ -102,7 +106,7 @@ const STORE = Redux.createStore((state = INIT_STATE, { type, payload }) => {
   }
 });
 
-// ============================================================================================================================
+// =========================================================[ API ]===================================================================
 
 const GET_MENU = async (uuid) => fetch(`${BASE_URL}/api/auth/menu/detail-view/${uuid}?BusinessId=${Metadata.b || 2}`).then(async (res) => {
   const payload = await res.json();
@@ -118,4 +122,35 @@ const UPDATE_PRODUCT_ORDER = async (order_id, product_id, payload) => fetch(`${B
 
 const DELETE_PRODUCT_ORDER = async (order_id, products) => fetch(`${BASE_URL}/api/bill/${order_id}/product`, { method: "DELETE", body: JSON.stringify(products), headers }).then(async (res) => res.json());
 
-GET_MENU(Metadata.m || "9f7e9234-f2a6-4daa-802c-403f7e8750f1").then(console.log);
+// =========================================================[ FIREBASE NOTIFICATION ]===================================================================
+
+const FIREBASE_KEY = "BN4m8YGrBzsg7anm8vEzPLQ7Gc7HagB4X2WMKSFGzzfApe39ADvXZ99rSkUnmSWSoWQ-NR60WI4pJ1DwuvLXKk8";
+function FIREBASE_INIT({ initializeApp, getMessaging, getToken, onMessage }) {
+  // Your web app's Firebase configuration
+  const app = initializeApp({
+    apiKey: "AIzaSyBxkabccm8TDL6ku0nrrUQHtbv5w2upm3s",
+    authDomain: "beststore-b8257.firebaseapp.com",
+    projectId: "beststore-b8257",
+    storageBucket: "beststore-b8257.appspot.com",
+    messagingSenderId: "175988176537",
+    appId: "1:175988176537:web:1840fd9820391d59bbaa08"
+  });
+
+  const messaging = getMessaging(app);
+
+  GET_MENU(Metadata.m || "9f7e9234-f2a6-4daa-802c-403f7e8750f1").then(console.log);
+
+  if (!('serviceWorker' in navigator)) return alert("This browser will nt support background notification, tell this page open.");
+
+  navigator.serviceWorker.register('./js/firebase-messaging-sw.js').then(() => getToken(messaging, { vapidKey: FIREBASE_KEY }).then(token => {
+    STORE.dispatch({ type: ACTION_REDUX.FCM_DEVICE_TOKEN_CREATED, payload: token });
+    new BroadcastChannel('sw-messages').onmessage = ({ data: { data, notification } }) => DATA_ORDER_CHANGE({ data, notification });
+    onMessage(messaging, ({ data, notification }) => DATA_ORDER_CHANGE({ data, notification }));
+  }));
+};
+
+
+function DATA_ORDER_CHANGE(payload) {
+  console.log("DATA_ORDER_CHANGE FUNCTION RECEIVED DATA : ", payload);
+  console.log("DATA_ORDER_CHANGE FUNCTION RECEIVED DATA : ", JSON.parse(payload.data.payload));
+};

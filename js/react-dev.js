@@ -96,7 +96,7 @@ function OrderMenu() {
       return { ..._, Name, Currency, Url };
     });
 
-    setState({ OrderCreated, Product: StateOrder, Currency: Menu.Currency.Symbol });
+    setState({ OrderCreated, Product: StateOrder, Currency: Menu.Currency?.Symbol });
   });
 
   const Total = state.Product?.reduce((_, __) => _ + __.Price * __.Quantity, 0);
