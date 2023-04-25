@@ -152,5 +152,4 @@ function FIREBASE_INIT({ initializeApp, getMessaging, getToken, onMessage }) {
 
 function DATA_ORDER_CHANGE(payload) {
   console.log("DATA_ORDER_CHANGE FUNCTION RECEIVED DATA : ", payload);
-  console.log("DATA_ORDER_CHANGE FUNCTION RECEIVED DATA : ", JSON.parse(payload.data.payload));
 };
