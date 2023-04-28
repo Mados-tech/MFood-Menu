@@ -1,9 +1,11 @@
-const DefaultRecipeImage =
-  "https://i.guim.co.uk/img/media/e3ea5d04e32182134a133c6a8f1eb3328e2c8246/0_0_4367_3716/master/4367.jpg?width=465&quality=85&dpr=1&s=none";
+const DefaultRecipeImage = "https://i.guim.co.uk/img/media/e3ea5d04e32182134a133c6a8f1eb3328e2c8246/0_0_4367_3716/master/4367.jpg?width=465&quality=85&dpr=1&s=none";
 
-function ListMenu({ iconName, link, listname, active }) {
+function ListMenu({ onClick, iconName, link, listname, active }) {
   return (
-    <li>
+    <li className="sidebar_list_menu" onClick={e => {
+        e.stopPropagation();
+        onClick && onClick();
+    }}>
       <a href={link} className={active && "active"}>
         <i className={iconName}></i>
         {listname}
@@ -47,18 +49,24 @@ function Recipe({ id, Name, Price, Currency, CurrencyId, Description, Url }) {
 }
 
 function SideBar() {
-  const [ business, setBusiness ] = React.useState({});
-  STORE.subscribe(() => setBusiness(STORE.getState().Menu?.Business || {}));
+  const [state, setState] = React.useState({});
+  STORE.subscribe(() => {
+    const { Menu, SmallScreen } = STORE.getState();
+    setState({ Business: Menu?.Business || {}, SmallScreen });
+  });
+
   return (
     <div className="sideBar">
       <div className="logo">
-        <img src={business.Logo || "../assets/logoApp.png"} alt="MFood" width={40} height={40} />
+        <img src={state.Business?.Logo || "../assets/logoApp.png"} alt="MFood" width={40} height={40} />
       </div>
       <ul className="Menu_categories">
         <ListMenu iconName={"fa-solid fa-utensils"} link={"#"} active={true} listname={"Food"} />
         <ListMenu iconName={"fa-solid fa-champagne-glasses"} link={"#"} listname={"Drink"} />
       </ul>
-      <i className="fas fa-bars" />
+      {
+        state.SmallScreen && <ListMenu onClick={TOGGLE_MENU_PRODUCT_DISPLAY} iconName={"fas fa-bars"} active={false} link={"#"} listname={"Menu"} />
+      }
     </div>
   );
 }
@@ -88,7 +96,7 @@ function OrderMenu() {
   const [state, setState] = React.useState({});
 
   STORE.subscribe(() => {
-    const { Order, Menu, OrderCreated } = STORE.getState();
+    const { Order, Menu, OrderCreated, SmallScreen, ShowOrderList } = STORE.getState();
     const Products = Menu.Categories?.reduce((_, __) => [..._, ...__.Product], []);
 
     const StateOrder = Order.Product.map((_) => {
@@ -96,14 +104,23 @@ function OrderMenu() {
       return { ..._, Name, Currency, Url };
     });
 
-    setState({ OrderCreated, Product: StateOrder, Currency: Menu.Currency?.Symbol });
+    setState({ OrderCreated, Product: StateOrder, Currency: Menu.Currency?.Symbol, SmallScreen, ShowOrderList });
   });
 
   const Total = state.Product?.reduce((_, __) => _ + __.Price * __.Quantity, 0);
+
+  if (!state.ShowOrderList && state.SmallScreen) return <></>;
+
   return (
     <div className="order_container">
       <div className="order_container_children">
-        <h1 className="order_container_children_header_title">Order <span>Menu</span></h1>
+        <div className="order_container_children_header">
+          <h1 className="order_container_children_header_title">Order <span>Menu</span></h1>
+          <i className="fas fa-times" onClick={e => {
+            e.stopPropagation();
+            TOGGLE_MENU_PRODUCT_DISPLAY();
+          }}></i>
+        </div>
         <div className="wrapper">
           {state.Product?.map((_) => <OrderProduct key={_.ProductId} {..._} />)}
         </div>
@@ -176,6 +193,9 @@ function MenuDisplayer() {
         </span>
       </div>
       <div className="RecipeDisplayer">
+        {/* { window.innerWidth }
+        <br/>
+        { window.innerHeight } */}
         {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
       </div>
       {/* <div className="menu_order_container"></div> */}

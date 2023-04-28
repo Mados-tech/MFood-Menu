@@ -30,6 +30,8 @@ const INIT_STATE = {
     Product: [],
     Metadata: {},
   },
+  ShowOrderList: !(this.window.innerWidth < 1110),
+  SmallScreen: this.window.innerWidth < 1110
 };
 
 const ACTION_REDUX = {
@@ -40,6 +42,8 @@ const ACTION_REDUX = {
   DELETE_PRODUCT_TO_ORDER: "DELETE_PRODUCT_TO_ORDER",
   ORDER_CREATED: "ORDER_CREATED",
   FCM_DEVICE_TOKEN_CREATED: "FCM_DEVICE_TOKEN_CREATED",
+  TOGGLE_ORDER_MENU_DISPLAY: "TOGGLE_ORDER_MENU_DISPLAY",
+  SCREEN_RESIZING: "SCREEN_RESIZING"
 };
 
 const PROCESS_STORE = {
@@ -56,6 +60,12 @@ const STORE = Redux.createStore((state = INIT_STATE, { type, payload }) => {
   switch (type) {
     case ACTION_REDUX.INIT_DATA:
       return payload;
+
+    case ACTION_REDUX.SCREEN_RESIZING:
+      return { ...state, ShowOrderList: !(this.window.innerWidth < 1110), SmallScreen: payload };
+    
+    case ACTION_REDUX.TOGGLE_ORDER_MENU_DISPLAY:
+      return { ...state, ShowOrderList: !state.ShowOrderList };
 
     case ACTION_REDUX.FCM_DEVICE_TOKEN_CREATED:
       return { ...state, Order: { ...state.Order, FcmClientToken: payload } };
@@ -105,6 +115,10 @@ const STORE = Redux.createStore((state = INIT_STATE, { type, payload }) => {
       return state;
   }
 });
+
+window.addEventListener("resize", () => STORE.dispatch({ type: ACTION_REDUX.SCREEN_RESIZING, payload: this.window.innerWidth < 1110 }));
+
+const TOGGLE_MENU_PRODUCT_DISPLAY = () => STORE.dispatch({ type: ACTION_REDUX.TOGGLE_ORDER_MENU_DISPLAY, payload: null });
 
 // =========================================================[ API ]===================================================================
 
