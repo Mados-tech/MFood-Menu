@@ -3,8 +3,8 @@ const DefaultRecipeImage = "https://i.guim.co.uk/img/media/e3ea5d04e32182134a133
 function ListMenu({ onClick, iconName, link, listname, active }) {
   return (
     <li className="sidebar_list_menu" onClick={e => {
-        e.stopPropagation();
-        onClick && onClick();
+      e.stopPropagation();
+      onClick && onClick();
     }}>
       <a href={link} className={active && "active"}>
         <i className={iconName}></i>
@@ -112,14 +112,17 @@ function OrderMenu() {
   if (!state.ShowOrderList && state.SmallScreen) return <></>;
 
   return (
-    <div className="order_container">
+    <div className={`order_container ${state.ShowOrderList && 'order_container_show'}`} >
       <div className="order_container_children">
         <div className="order_container_children_header">
           <h1 className="order_container_children_header_title">Order <span>Menu</span></h1>
-          <i className="fas fa-times" onClick={e => {
-            e.stopPropagation();
-            TOGGLE_MENU_PRODUCT_DISPLAY();
-          }}></i>
+          {
+            state.SmallScreen &&
+            <i className="fas fa-times" onClick={e => {
+              e.stopPropagation();
+              TOGGLE_MENU_PRODUCT_DISPLAY();
+            }}></i>
+          }
         </div>
         <div className="wrapper">
           {state.Product?.map((_) => <OrderProduct key={_.ProductId} {..._} />)}
@@ -193,9 +196,35 @@ function MenuDisplayer() {
         </span>
       </div>
       <div className="RecipeDisplayer">
-        {/* { window.innerWidth }
-        <br/>
-        { window.innerHeight } */}
+        {/* {window.innerWidth}
+        <br />
+        {window.innerHeight} */}
+        {/* <div className="blank_page_animation"></div> */}
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
+        {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
         {ListCategoryFilter?.find((_) => _.id === state.SelectedCategoryId)?.Product.map((_) => <Recipe key={_.id} {..._} />)}
       </div>
       {/* <div className="menu_order_container"></div> */}

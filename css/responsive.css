@@ -26,36 +26,34 @@
     padding: 2rem;
     overflow: hidden;
     background-color: rgba(0, 0, 0, 40%);
-
-    /*
-    margin: auto;
-    border-radius: 1rem 1rem 0 0;
-    animation: animation1 2s ease 0s 0 alternate none;
-    */
   }
 
   .order_container_children {
     overflow: hidden;
     height: 90vh;
     border-radius: 0.4rem;
+    flex-direction: column;
+    gap: 1rem;
   }
-
-  .order_container_children {
-    /* height: 87%; */
-  }
+  
   .Price_displayer {
     height: fit-content;
   }
-  @keyframes animation1 {
+
+  .order_container_show {
+    animation: order_container_animation 400ms ease-in-out;
+  }
+
+  /* .RecipeDisplayer {
+
+  } */
+
+  @keyframes order_container_animation {
     0% {
-      transform: translateY(0);
+      opacity: 0;
     }
     100% {
-      transform: translateY(-100px);
+      opacity: 1;
     }
-  }
-  .order_container_children {
-    flex-direction: column;
-    gap: 1rem;
   }
 }

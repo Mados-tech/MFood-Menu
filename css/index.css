@@ -19,6 +19,38 @@
   user-select: none;
 }
 
+.flex_center {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.blank_page_animation {
+  padding: 1rem;
+  position: relative;
+}
+
+.blank_page_animation::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 45%;
+  border-radius: 50%;
+  padding: 0.5rem;
+  border: 0.4rem solid var(--cardColor);
+  border-right-color: var(--primaryColor);
+  animation: blank_page_animation 800ms linear infinite;
+}
+
+
+@keyframes blank_page_animation {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .Application {
   width: 100vw;
   height: 100vh;
@@ -203,12 +235,10 @@ h1 > span {
 .RecipeDisplayer {
   display: flex;
   flex-wrap: wrap;
-  /* height: 27rem; */
-  /* height: 100%; */
   width: 100%;
   overflow-y: scroll;
-  /* overflow-x: hidden; */
-  gap: 1rem;
+  gap: 0.7rem;
+  justify-content: center;
 }
 .RecipeDisplayer::-webkit-scrollbar {
   width: 0px;
@@ -251,8 +281,6 @@ h1 > span {
 .order_container {
   width: 35rem;
   overflow-y: hidden;
-  /* display: none; */
-  /* background-color: red; */
 }
 
 .order_container_children {
@@ -269,21 +297,18 @@ h1 > span {
 .order_container_children_header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 0rem 0.5rem;
 }
 
 .order_container_children_header i {
-  font-size: 1.3rem;
-  background-color: var(--primaryColor);
-  color: var(--cardColor);
-  padding: 0.5rem 1rem;
-  border-radius: 0.3rem;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: var(--primaryColor);
+  font-weight: bold;
+  padding: 0.3rem 0.7rem;
 }
 
 .order_container_children_header_title {
   font-size: 1.3rem;
-  padding-top: 0.5rem;
 }
 
 .order_container_children {
